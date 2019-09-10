@@ -1,0 +1,28 @@
+Remote server changes
+1. copy the attached check_interface.py to the naptech server path (/opt/nagios)
+2. give execution permission
+3. change the ownler as ssh login user
+4. run the check_interface.py and check the output --> here the assumption is json is in /usr/local/nagios/libexec/sampleOutput.json
+Nagios server changes
+1. run run /usr/lib64/nagios/plugins/check_by_ssh -l <USERNAME> 
+2. accept the rsa key 
+3. run /usr/lib64/nagios/plugins/check_by_ssh -l <USERNAME> -i ~/.ssh/id_rsa -H <remote_host_IP> -C /opt/nagios/check_interface.py and check the status 
+4. output should be same as in Remote server
+5.under command folder create a file check_interface_command.cfg
+vi check_interface_command.cfg
+	define command {
+		command_name    check_interface
+		command_line    /usr/lib64/nagios/plugins/check_by_ssh -l <USERNAME> -i ~/.ssh/id_rsa -H <remote_host_IP> -C /opt/nagios/check_interface.py
+	}
+6. update the username and remote ip in the above file
+7. under servive folder create file called check_interface_service.cfg
+vi check_interface_service.cfg
+	define service {
+		use                 generic-service
+		host_name           localhost
+		service_description Check Interface status
+		check_command       check_interface
+	}
+	
+8. Check the status in the nagios web admin
+
