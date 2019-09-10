@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+import json
+import os.path
+
+
+# CONSTANTS FOR RETURN CODES UNDERSTOOD BY NAGIOS
+# Exit statuses recognized by Nagios
+UNKNOWN = -1
+OK = 0
+WARNING = 1
+CRITICAL = 2
+
+global errorOccured
+errorOccured=False
+
+file_path="/usr/local/nagios/libexec/sampleOutput.json"
+
+if(os.path.exists(file_path)):	
+	with open(file_path) as json_file:
+		data = json.load(json_file)
+		for adapter in data['adapters']:
+			print('Name: ' + adapter['name'])
+			for sensor in adapter['sensors']:
+				if 'name' in sensor:
+					print("Sensor Name:" + sensor['name'] + " --> " + sensor['state'])
+					if sensor['state'] != "OK":						
+						errorOccured=True
+			print('Id: ' + str(adapter['id']))
+			print('==============')
+else:
+	print("Card details not available")
+	raise SystemExit, CRITICAL
+
+if errorOccured:
+	print("Sensor state is not stable")
+	raise SystemExit, CRITICAL
+else:
+	print("All interfaces are up")
+	raise SystemExit, OK
