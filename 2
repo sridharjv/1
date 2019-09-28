@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import json
+import os.path
+import glob
+import os
+import sys
+
+
+
+print(sys.argv, len(sys.argv))
+
+# CONSTANTS FOR RETURN CODES UNDERSTOOD BY NAGIOS
+# Exit statuses recognized by Nagios
+UNKNOWN = -1
+OK = 0
+WARNING = 1
+CRITICAL = 2
+
+global errorOccured
+errorOccured=False
+
+file_path=sys.argv[1]
+print("file path "+ file_path)
+list_of_files = glob.glob(file_path+'/*.json') # * means all if need specific format then *.csv
+latest_file = max(list_of_files, key=os.path.getctime)
+print("latest file path "+ latest_file)
+
+if(os.path.exists(latest_file)):	
+	with open(latest_file) as json_file:
+		data = json.load(json_file)
+		for adapter in data['adapters']:
+			print('Name: ' + adapter['name'])
+			for sensor in adapter['sensors']:
+				if 'name' in sensor:
+					print("Sensor Name:" + sensor['name'] + " --> " + sensor['state'])
+					if sensor['state'] != "OK":						
+						errorOccured=True
+			print('Id: ' + str(adapter['id']))
+			print('==============')
+		json_file.close()
+else:
+	print("Card details not available")
+	sys.exit(CRITICAL)
+	
+
+if errorOccured:
+	print("Sensor state is not stable")
+	sys.exit(CRITICAL)
+else:
+	print("All interfaces are up")
+	sys.exit(OK)	
