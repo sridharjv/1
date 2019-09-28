@@ -1,0 +1,70 @@
+Host Definition:
+A host definition is used to define a physical server, workstation, device, etc. that resides on your network.
+Adding host definition in the host.cfg file ---> /nagios/objects/host.cfg
+define host{
+host_name napa_1
+use Naptech
+alias Naptech Server
+address 123.01.11.1
+check_command command_name_to_check
+max_check_attempts 5
+check_period 24x7
+notification_interval 30
+notification_period 24x7
+notification_options d,u,r
+}
+define host{
+host_name napa_2
+use Naptech
+alias Naptech Server
+address 123.01.11.2
+check_command command_name_to_check
+max_check_attempts 5
+check_period 24x7
+notification_interval 30
+notification_period 24x7
+notification_options d,u,r
+}
+define host{
+host_name napa_3
+use Naptech
+alias Naptech Server
+address 123.01.11.3
+check_command command_name_to_check
+max_check_attempts 5
+check_period 24x7
+notification_interval 30
+notification_period 24x7
+notification_options d,u,r
+}
+define host{
+host_name napa_4
+use Naptech
+alias Naptech Server
+address 123.01.11.4
+check_command command_name_to_check
+max_check_attempts 5
+check_period 24x7
+notification_interval 30
+notification_period 24x7
+notification_options d,u,r
+}
+Command Definition:
+Next let’s define a new command to be called from a Nagios service. This will be defined in the
+commands.cfg file. (nagios/objects/commands.cfg)
+In this we will create a new command,
+define command{
+command_name check_ping
+command_line /usr/local/nagios/libexec/check_ping -H $HOSTADDRESS$
+}
+Service Definition:
+Need to create services which will call the newly created commands. We will place these definitions in
+the custom-services.cfg file. These will be very specific to the nodes you are monitoring.
+This creates a service that runs on all servers.
+Create four services in the service.cfg file (nagios/objects/services.cfg)
+define service {
+use Naptech ; Name of service template to use
+host_name napa_1, napa_2, napa_3, napa_4
+service_description PING
+check_command check_ping!100.0,20%!500.0,60%
+}
